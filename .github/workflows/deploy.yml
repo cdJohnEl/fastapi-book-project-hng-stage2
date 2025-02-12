@@ -1,0 +1,26 @@
+name: CD Pipeline
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo apt-get update -y
+            sudo apt-get install -y docker-ce docker-compose
+            cd /home/ubuntu/
+            git clone <your-github-repo>
+            cd fastapi-book-project/
+            git pull
+            docker-compose up -d --build
+
